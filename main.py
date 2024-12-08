@@ -67,9 +67,9 @@ def matcher(people, person_filter: dict = None):
                 break
             matches.append({"Gifter": {"Name": gifters[i]["Name"], "Email": gifters[i]["Email"]},
                             "Giftee": {"Name": giftees[i]["Name"],
-                                       "Gifts": [giftees[i]["Amazon link to Gift #1 ($25 max)"],
-                                                 giftees[i]["Amazon link to Gift #2 ($25 max)"],
-                                                 giftees[i]["Amazon link to Gift #3 ($25 max)"]]}})
+                                       "Gifts": [giftees[i]["Amazon link to Gift #1 ($30 max)"],
+                                                 giftees[i]["Amazon link to Gift #2 ($30 max)"],
+                                                 giftees[i]["Amazon link to Gift #3 ($30 max)"]]}})
         if len(matches) == len(people):
             break
     return matches
@@ -117,8 +117,9 @@ def send_email(secret_santa, debug):
         part2 = MIMEText(html, "html")
         message.attach(part1)
         message.attach(part2)
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender_email, password)
+        with smtplib.SMTP(creds.smtp_host, creds.smtp_port) as server:
+            server.starttls()
+            server.login(creds.username, password)
             server.sendmail(
                 sender_email, receiver_email, message.as_string()
             )
@@ -127,7 +128,7 @@ def send_email(secret_santa, debug):
 
 
 def writer(secret_santa):
-    with open('secretSanta.txt', 'w') as convert_file:
+    with open('secretSanta.json', 'w') as convert_file:
         convert_file.write(json.dumps(secret_santa))
 
 
@@ -151,5 +152,5 @@ def main():
         send_email(secret_santa[i], debug)
     exit(0)
 
-
-main()
+if __name__ == '__main__':
+    main()
